@@ -85,10 +85,10 @@ namespace BlockeonsDratris.UI
             }
         }
 
-        private void HandleVictory()
+        private void HandleVictory(int goldGained, int crystalsGained)
         {
             if (resultPanel != null)
-                resultPanel.ShowVictory();
+                resultPanel.ShowVictory(goldGained, crystalsGained);
         }
 
         private void HandleDefeat()

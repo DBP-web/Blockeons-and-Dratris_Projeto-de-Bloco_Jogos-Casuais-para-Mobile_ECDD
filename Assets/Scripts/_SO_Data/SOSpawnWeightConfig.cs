@@ -1,7 +1,22 @@
+using BlockeonsDratris.Blocks;
 using UnityEngine;
 
 namespace BlockeonsDratris.Data
 {
+    [System.Serializable]
+    public class OffensiveBlockVisual
+    {
+        public OffensiveBlockType type;
+        public Sprite sprite;
+    }
+
+    [System.Serializable]
+    public class SupportBlockVisual
+    {
+        public SupportBlockType type;
+        public Sprite sprite;
+    }
+
     [CreateAssetMenu(fileName = "SOSpawnWeightConfig", menuName = "BlockeonsDratris/Spawn Weight Config")]
     public class SOSpawnWeightConfig : ScriptableObject
     {
@@ -19,6 +34,37 @@ namespace BlockeonsDratris.Data
 
         [Header("Modos de dificuldade disponíveis")]
         public SOGameModeConfig[] gameModes;
+
+        [Header("Sprites - Blocos Ofensivos (3 tipos)")]
+        public OffensiveBlockVisual[] offensiveVisuals;
+
+        [Header("Sprites - Blocos de Suporte (3 tipos)")]
+        public SupportBlockVisual[] supportVisuals;
+
+        [Header("Sprite - Bloco de Escudo")]
+        public Sprite shieldSprite;
+
+        public Sprite GetSpriteFor(OffensiveBlockType type) 
+        {
+            foreach (var visual in offensiveVisuals)
+            {
+                if (visual.type == type)
+                    return visual.sprite;
+            }
+            Debug.LogWarning($"[{name}] Sprite não encontrado para OffensiveBlockType {type}.");
+            return null;
+        }
+        public Sprite GetSpriteFor(SupportBlockType type) 
+        {
+            foreach (var visual in supportVisuals)
+            {
+                if (visual.type == type)
+                    return visual.sprite;
+            }
+            Debug.LogWarning($"[{name}] Sprite não encontrado para SupportBlockType {type}.");
+            return null;
+
+        }
 
         public SOGameModeConfig GetConfigForMode(GameModeType mode)
         {

@@ -8,8 +8,8 @@ namespace BlockeonsDratris.Board
     public class BoardManager : MonoBehaviour
     {
         [Header("Configuração do Grid")]
-        public int columns = 7;
-        public int rows = 8;
+        public int columns = 5;
+        public int rows = 6;
         public float cellSize = 1f;
         public Vector2 boardOrigin = Vector2.zero;
 
@@ -43,6 +43,40 @@ namespace BlockeonsDratris.Board
                     SpawnBlockAt(c, r);
                 }
             }
+        }
+
+        public void ClearBoard()
+        {
+            // Interrompe qualquer swap/chain em andamento (importante no retry,
+            // pois a corrotina antiga pode ainda estar rodando e usando o grid velho)
+            StopAllCoroutines();
+            isProcessing = false;
+            selectedBlock = null;
+
+            if (grid != null)
+            {
+                for (int c = 0; c < columns; c++)
+                {
+                    for (int r = 0; r < rows; r++)
+                    {
+                        if (grid[c, r] != null)
+                        {
+                            Destroy(grid[c, r].gameObject);
+                            grid[c, r] = null;
+                        }
+                    }
+                }
+            }
+
+            // Segurança extra: qualquer bloco que ainda seja filho deste transform
+            // mas não esteja mais referenciado no grid (ex: preso numa animação
+            // de swap/queda no momento do retry) também é destruído.
+            for (int i = transform.childCount - 1; i >= 0; i--)
+            {
+                Destroy(transform.GetChild(i).gameObject);
+            }
+
+            grid = new BlockBase[columns, rows];
         }
 
         private void SpawnBlockAt(int c, int r)

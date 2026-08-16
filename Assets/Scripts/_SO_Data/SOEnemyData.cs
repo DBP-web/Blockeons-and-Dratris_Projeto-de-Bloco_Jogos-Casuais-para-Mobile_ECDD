@@ -10,8 +10,8 @@ namespace BlockeonsDratris.Data
         public Sprite portrait;
 
         [Header("Status")]
-        public int maxHP = 150;
-        public int counterAttackDamage = 8;
+        public int maxHP = 5000;
+        public int counterAttackDamage = 20;
 
         [Header("Comportamento")]
         [Tooltip("A cada quantas jogadas do jogador o inimigo contra-ataca")]

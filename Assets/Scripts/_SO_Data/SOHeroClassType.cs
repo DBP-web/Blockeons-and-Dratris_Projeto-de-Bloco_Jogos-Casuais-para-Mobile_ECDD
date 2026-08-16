@@ -12,6 +12,10 @@ namespace BlockeonsDratris.Data
         Flecha,
         Pocao
     }
+    public enum DefensiveBlockType
+    {
+        Escudo
+    }
     public enum GameModeType
     {
         Ease,

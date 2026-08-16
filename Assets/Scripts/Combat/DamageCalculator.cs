@@ -21,7 +21,7 @@ namespace BlockeonsDratris.Combat
 
         [Header("Configuração de Energia")]
         [Tooltip("Energia gerada por bloco em um grupo de match (qualquer tipo)")]
-        public int energyPerBlock = 5;
+        public int energyPerBlock = 1;
 
         public CombatResult CalculateStep(List<MatchGroup> matches, int chainIndex)
         {
@@ -57,8 +57,9 @@ namespace BlockeonsDratris.Combat
                             break;
                         }
 
-                    case ShieldBlock:
+                    case ShieldBlock defence:
                         {
+                            ApplyShieldEffect(defence, group.Size, sizeMult, chainMult, ref result);
                             // Bloco de escudo não gera dano nem cura no protótipo atual.
                             // Reservado para futura mecânica de defesa/mitigação.
                             break;
@@ -85,6 +86,15 @@ namespace BlockeonsDratris.Combat
                 case SupportBlockType.Cristal:
                     result.crystalsGained += Mathf.RoundToInt(groupSize * 1 * sizeMult);
                     break;
+            }
+        }
+        private void ApplyShieldEffect(ShieldBlock shield, int groupSize, float sizeMult, float chainMult, ref CombatResult result)
+        {
+            switch (shield.shieldBlocktype)
+            { 
+                case ShieldBlockType.Shield:
+                result.goldGained += Mathf.RoundToInt(groupSize * 10 * sizeMult);
+                break; 
             }
         }
     }

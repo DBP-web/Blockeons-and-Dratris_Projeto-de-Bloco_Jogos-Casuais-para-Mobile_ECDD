@@ -16,6 +16,10 @@ namespace BlockeonsDratris.Blocks
         Ouro,
         Cristal
     }
+    public enum ShieldBlockType
+    {
+        Shield
+    }
 
     public abstract class BlockBase : MonoBehaviour
     {
