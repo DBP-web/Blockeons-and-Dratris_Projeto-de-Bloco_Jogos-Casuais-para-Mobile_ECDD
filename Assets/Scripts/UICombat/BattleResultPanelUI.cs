@@ -1,6 +1,8 @@
-using UnityEngine;
-using UnityEngine.UI;
 using BlockeonsDratris.Core;
+using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace BlockeonsDratris.UI
 {
@@ -10,9 +12,16 @@ namespace BlockeonsDratris.UI
         public GameObject victoryPanel;
         public GameObject defeatPanel;
 
+        [Header("Textos de Recompensa (Vitória)")]
+        public TextMeshProUGUI goldGainedText;
+        public TextMeshProUGUI crystalsGainedText;
+
         [Header("Botões")]
         public Button retryButton;
         public Button continueButton;
+
+        [Header("Cena de destino do botão Continue")]
+        public string mainMenuSceneName = "Tittle_Screen";
 
         [Header("Dependência")]
         public GameCore gameCore;
@@ -23,12 +32,29 @@ namespace BlockeonsDratris.UI
 
             if (retryButton != null)
                 retryButton.onClick.AddListener(OnRetryClicked);
+
+            if (continueButton != null)
+                continueButton.onClick.AddListener(OnContinueClicked);
         }
 
-        public void ShowVictory()
+        // Nova versão: recebe os ganhos e exibe na UI
+        public void ShowVictory(int goldGained, int crystalsGained)
         {
             HideAll();
+
             if (victoryPanel != null) victoryPanel.SetActive(true);
+
+            if (goldGainedText != null)
+                goldGainedText.text = $"+{goldGained}";
+
+            if (crystalsGainedText != null)
+                crystalsGainedText.text = $"+{crystalsGained}";
+        }
+
+        // Overload mantido para compatibilidade, caso algo ainda chame sem parâmetros
+        public void ShowVictory()
+        {
+            ShowVictory(0, 0);
         }
 
         public void ShowDefeat()
@@ -47,6 +73,11 @@ namespace BlockeonsDratris.UI
         {
             HideAll();
             if (gameCore != null) gameCore.RestartBattle();
+        }
+
+        private void OnContinueClicked()
+        {
+            SceneManager.LoadScene(mainMenuSceneName);
         }
     }
 }

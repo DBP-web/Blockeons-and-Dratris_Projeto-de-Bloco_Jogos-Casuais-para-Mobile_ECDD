@@ -23,13 +23,19 @@ namespace BlockeonsDratris.Board
             spawnConfig = config;
             heroData = hero;
             currentGameMode = mode;
-            activeModeConfig = spawnConfig.GetConfigForMode(mode);
+            activeModeConfig = spawnConfig.GetConfigForMode(mode); // só aqui é setado
         }
 
         public GameObject SpawnRandomBlock(Transform parent)
         {
             // Sorteio 1: Raro vs Comum
             float roll1 = Random.Range(0f, 100f);
+
+            if (activeModeConfig == null)
+            {
+                Debug.LogWarning("BlockSpawner: Initialize não foi chamado. Usando fallback.");
+                Initialize(spawnConfig, heroData, currentGameMode);
+            }
 
             if (roll1 <= spawnConfig.rareChance)
             {
@@ -39,6 +45,7 @@ namespace BlockeonsDratris.Board
             {
                 return SpawnCommonBlock(parent);
             }
+
         }
 
         private GameObject SpawnRareBlock(Transform parent)
@@ -62,6 +69,7 @@ namespace BlockeonsDratris.Board
             GameObject obj = Instantiate(supportBlockPrefab, parent);
             SupportBlock support = obj.GetComponent<SupportBlock>();
             support.supportType = chosenType;
+            ApplySprite(obj, spawnConfig.GetSpriteFor(chosenType));
             return obj;
         }
 
@@ -75,7 +83,9 @@ namespace BlockeonsDratris.Board
             }
             else
             {
-                return Instantiate(shieldBlockPrefab, parent);
+                GameObject shieldObj = Instantiate(shieldBlockPrefab, parent);
+                ApplySprite(shieldObj, spawnConfig.shieldSprite);
+                return shieldObj;
             }
         }
 
@@ -101,7 +111,23 @@ namespace BlockeonsDratris.Board
             GameObject obj = Instantiate(offensiveBlockPrefab, parent);
             OffensiveBlock offensive = obj.GetComponent<OffensiveBlock>();
             offensive.offensiveType = chosenType;
+            ApplySprite(obj, spawnConfig.GetSpriteFor(chosenType));
             return obj;
+        }
+
+        private void ApplySprite(GameObject obj, Sprite sprite)
+        {
+            if (sprite == null) return;
+
+            SpriteRenderer renderer = obj.GetComponent<SpriteRenderer>();
+            if (renderer != null)
+            {
+                renderer.sprite = sprite;
+            }
+            else
+            {
+                Debug.LogWarning($"BlockSpawner: SpriteRenderer não encontrado em {obj.name}.");
+            }
         }
     }
 }

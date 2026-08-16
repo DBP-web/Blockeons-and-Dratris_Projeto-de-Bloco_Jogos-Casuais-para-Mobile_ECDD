@@ -17,24 +17,33 @@ namespace BlockeonsDratris.Combat
         public BoardManager boardManager;
         public DamageCalculator damageCalculator;
 
+        [Header("Persistência de Recompensas")]
+        public SOPlayerWallet playerWallet;
+
         [Header("Estado Runtime (somente leitura)")]
         public int currentHeroHP;
         public int currentEnemyHP;
         public int currentEnergy;
         public int movesSinceLastCounterAttack = 0;
+        public int totalGoldGained = 0;
+        public int totalCrystalsGained = 0;
+
+        [Header("Configuração de Spawn")]
+        public SOSpawnWeightConfig spawnConfig;
+        public GameModeType currentMode;
 
         private bool battleEnded = false;
 
         // Eventos para a UI
-        public System.Action OnBattleStarted;
-        public System.Action<int, int> OnHeroHPChanged;      // currentHP, maxHP
-        public System.Action<int, int> OnEnemyHPChanged;     // currentHP, maxHP
-        public System.Action<int, int> OnEnergyChanged;      // currentEnergy, maxEnergy
-        public System.Action<CombatResult, int> OnStepResolved; // resultado do passo, chainIndex
-        public System.Action<int> OnEnemyCounterAttack;      // dano recebido
-        public System.Action OnVictory;
-        public System.Action OnDefeat;
-        public System.Action OnSpecialAbilityUsed; // uso da habilidade especial
+        public event System.Action OnBattleStarted;
+        public event System.Action<int, int> OnHeroHPChanged;
+        public event System.Action<int, int> OnEnemyHPChanged;
+        public event System.Action<int, int> OnEnergyChanged;
+        public event System.Action<CombatResult, int> OnStepResolved;
+        public event System.Action<int> OnEnemyCounterAttack;
+        public event System.Action<int, int> OnVictory; // (totalGold, totalCrystals)
+        public event System.Action OnDefeat;
+        public event System.Action OnSpecialAbilityUsed; // uso da habilidade especial
 
         void Awake()
         {
@@ -67,12 +76,17 @@ namespace BlockeonsDratris.Combat
             damageCalculator.heroData = hero;
 
             battleEnded = false;
+            if (boardManager != null)
+                boardManager.enabled = true;
+
             currentHeroHP = heroData.maxHP;
             currentEnemyHP = enemyData.maxHP;
             currentEnergy = 0;
             movesSinceLastCounterAttack = 0;
+            totalGoldGained = 0;
+            totalCrystalsGained = 0;
 
-            boardManager.enabled = true;
+            boardManager.spawner.Initialize(spawnConfig, hero, currentMode);
             boardManager.SetupBoard();
 
             OnBattleStarted?.Invoke();
@@ -90,6 +104,9 @@ namespace BlockeonsDratris.Combat
             currentEnemyHP = Mathf.Max(0, currentEnemyHP - Mathf.RoundToInt(result.totalDamageToEnemy));
             currentHeroHP = Mathf.Min(heroData.maxHP, currentHeroHP + Mathf.RoundToInt(result.totalHealToHero));
             currentEnergy = Mathf.Min(heroData.maxEnergy, currentEnergy + result.energyGained);
+
+            totalGoldGained += result.goldGained;
+            totalCrystalsGained += result.crystalsGained;
 
             OnStepResolved?.Invoke(result, chainIndex);
             OnEnemyHPChanged?.Invoke(currentEnemyHP, enemyData.maxHP);
@@ -133,6 +150,7 @@ namespace BlockeonsDratris.Combat
             OnSpecialAbilityUsed?.Invoke();
 
             // Efeito da habilidade especial será resolvido em módulo futuro
+            // pois ainda nao sabemos se vamos colocar ataque especial ou nao. 
             // (ex.: SpecialAbilityResolver), acionado a partir daqui.
 
             return true;
@@ -144,7 +162,14 @@ namespace BlockeonsDratris.Combat
             {
                 battleEnded = true;
                 boardManager.enabled = false;
-                OnVictory?.Invoke();
+
+                if (playerWallet != null)
+                {
+                    playerWallet.AddGold(totalGoldGained);
+                    playerWallet.AddCrystals(totalCrystalsGained);
+                }
+
+                OnVictory?.Invoke(totalGoldGained, totalCrystalsGained);
             }
             else if (currentHeroHP <= 0 && !battleEnded)
             {
