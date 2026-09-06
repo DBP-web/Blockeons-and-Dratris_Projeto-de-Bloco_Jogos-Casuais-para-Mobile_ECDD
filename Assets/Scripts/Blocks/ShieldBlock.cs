@@ -5,7 +5,7 @@ namespace BlockeonsDratris.Blocks
 {
     public class ShieldBlock : BlockBase
     {
-        [Header("Tipo Ofensivo")]
+        [Header("Tipo Defensivo")]
         public ShieldBlockType shieldBlocktype;
 
         [Header("Valor de Escudo")]
