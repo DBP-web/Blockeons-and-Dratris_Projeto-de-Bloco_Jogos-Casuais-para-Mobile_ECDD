@@ -51,7 +51,7 @@ namespace BlockeonsDratris.Data
                 if (visual.type == type)
                     return visual.sprite;
             }
-            Debug.LogWarning($"[{name}] Sprite não encontrado para OffensiveBlockType {type}.");
+            Debug.Log($"[{name}] Sprite não encontrado para OffensiveBlockType {type}.");
             return null;
         }
         public Sprite GetSpriteFor(SupportBlockType type) 
@@ -61,7 +61,7 @@ namespace BlockeonsDratris.Data
                 if (visual.type == type)
                     return visual.sprite;
             }
-            Debug.LogWarning($"[{name}] Sprite não encontrado para SupportBlockType {type}.");
+            Debug.Log($"[{name}] Sprite não encontrado para SupportBlockType {type}.");
             return null;
 
         }
@@ -72,7 +72,7 @@ namespace BlockeonsDratris.Data
             {
                 if (config.modeType == mode) return config;
             }
-            Debug.LogWarning($"GameModeConfig não encontrado para o modo {mode}. Usando o primeiro disponível.");
+            Debug.Log($"GameModeConfig não encontrado para o modo {mode}. Usando o primeiro disponível.");
             return gameModes.Length > 0 ? gameModes[0] : null;
         }
 
@@ -80,11 +80,11 @@ namespace BlockeonsDratris.Data
         {
             float rareGroupTotal = healChance + goldChance + crystalChance;
             if (Mathf.Abs(rareGroupTotal - 100f) > 0.1f)
-                Debug.LogWarning($"[{name}] healChance + goldChance + crystalChance não soma 100 (atual: {rareGroupTotal}).");
+                Debug.Log($"[{name}] healChance + goldChance + crystalChance não soma 100 (atual: {rareGroupTotal}).");
 
             float commonGroupTotal = offensiveChance + shieldChance;
             if (Mathf.Abs(commonGroupTotal - 100f) > 0.1f)
-                Debug.LogWarning($"[{name}] offensiveChance + shieldChance não soma 100 (atual: {commonGroupTotal}).");
+                Debug.Log($"[{name}] offensiveChance + shieldChance não soma 100 (atual: {commonGroupTotal}).");
         }
     }
 }
