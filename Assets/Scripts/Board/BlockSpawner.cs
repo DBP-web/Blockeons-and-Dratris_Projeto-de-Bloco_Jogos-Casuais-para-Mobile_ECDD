@@ -33,7 +33,7 @@ namespace BlockeonsDratris.Board
 
             if (activeModeConfig == null)
             {
-                Debug.LogWarning("BlockSpawner: Initialize não foi chamado. Usando fallback.");
+                Debug.Log("BlockSpawner: Initialize não foi chamado. Usando fallback.");
                 Initialize(spawnConfig, heroData, currentGameMode);
             }
 
@@ -126,7 +126,7 @@ namespace BlockeonsDratris.Board
             }
             else
             {
-                Debug.LogWarning($"BlockSpawner: SpriteRenderer não encontrado em {obj.name}.");
+                Debug.Log($"BlockSpawner: SpriteRenderer não encontrado em {obj.name}.");
             }
         }
     }
