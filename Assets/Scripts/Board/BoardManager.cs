@@ -8,9 +8,9 @@ namespace BlockeonsDratris.Board
     public class BoardManager : MonoBehaviour
     {
         [Header("Configuração do Grid")]
-        public int columns = 5;
-        public int rows = 6;
-        public float cellSize = 1f;
+        public int columns = 9;
+        public int rows = 9;
+        public float cellSize = 0.5f;
         public Vector2 boardOrigin = Vector2.zero;
 
         [Header("Referências")]
@@ -27,6 +27,8 @@ namespace BlockeonsDratris.Board
         private BlockBase selectedBlock = null;
         private Vector2 touchStartPos;
         private const float SwipeThreshold = 0.3f;
+
+        private const int MaxSpawnAttempts = 20;
 
         void Awake()
         {
@@ -79,13 +81,56 @@ namespace BlockeonsDratris.Board
             grid = new BlockBase[columns, rows];
         }
 
+        // Ajuste da função, pois antes ela eliminava blocos com match previo,
+        // logo após o primeiro swipe do jogo. Isso elimina as "ilhas gigantes" que formavam um bloco compacto,
+        // porque a única forma de ter uma ilha conectada em formato irregular (tipo L ou T)
+        // sem ser detectada por essa checagem seria via diagonais.
         private void SpawnBlockAt(int c, int r)
         {
-            GameObject obj = spawner.SpawnRandomBlock(transform);
-            BlockBase block = obj.GetComponent<BlockBase>();
+
+            GameObject obj = null;
+            BlockBase block = null;
+            int attempts = 0;
+
+            do
+            {
+                if (obj != null)
+                {
+                    Destroy(obj);
+                }
+
+                obj = spawner.SpawnRandomBlock(transform);
+                block = obj.GetComponent<BlockBase>();
+                attempts++;
+
+                // Coloca temporariamente no grid lógico para poder checar com o MatchFinder real
+                grid[c, r] = block;
+                block.SetGridPosition(c, r);
+            }
+            while (attempts < MaxSpawnAttempts && CreatesPrematureMatch(c, r));
+
             block.Setup(c, r);
             block.SetWorldPosition(GridToWorld(c, r));
-            grid[c, r] = block;
+            grid[c, r] = block; // confirma a posição final
+        }
+
+        // Usa o MatchFinder real (mesma lógica de flood fill do jogo) para checar
+        // se a célula recém-preenchida participa de algum grupo >= 3, considerando
+        // TODAS as formas possíveis (linha, L, T, quadrado), não só linha reta.
+        private bool CreatesPrematureMatch(int c, int r)
+        {
+            var matches = matchFinder.FindAllMatches(grid);
+
+            foreach (var group in matches)
+            {
+                foreach (var b in group.blocks)
+                {
+                    if (b.column == c && b.row == r)
+                        return true; // o bloco novo faz parte de algum match
+                }
+            }
+
+            return false;
         }
 
         private Vector3 GridToWorld(int c, int r)

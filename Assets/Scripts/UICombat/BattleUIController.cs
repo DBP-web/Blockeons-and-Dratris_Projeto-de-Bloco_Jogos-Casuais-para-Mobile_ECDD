@@ -12,6 +12,7 @@ namespace BlockeonsDratris.UI
         public HealthBarUI heroHealthBar;
         public HealthBarUI enemyHealthBar;
         public EnergyBarUI energyBar;
+        public ShieldBarUI shieldBar;
         public ChainIndicatorUI chainIndicator;
         public BattleResultPanelUI resultPanel;
 
@@ -27,10 +28,12 @@ namespace BlockeonsDratris.UI
             battleManager.OnHeroHPChanged += HandleHeroHPChanged;
             battleManager.OnEnemyHPChanged += HandleEnemyHPChanged;
             battleManager.OnEnergyChanged += HandleEnergyChanged;
+            battleManager.OnShieldChanged += HandleShieldChanged;
             battleManager.OnStepResolved += HandleStepResolved;
             battleManager.OnEnemyCounterAttack += HandleEnemyCounterAttack;
             battleManager.OnVictory += HandleVictory;
             battleManager.OnDefeat += HandleDefeat;
+            battleManager.OnSpecialAbilityDamageDealt += HandleSpecialAbilityDamage;
         }
 
         void OnDisable()
@@ -41,10 +44,12 @@ namespace BlockeonsDratris.UI
             battleManager.OnHeroHPChanged -= HandleHeroHPChanged;
             battleManager.OnEnemyHPChanged -= HandleEnemyHPChanged;
             battleManager.OnEnergyChanged -= HandleEnergyChanged;
+            battleManager.OnShieldChanged -= HandleShieldChanged;
             battleManager.OnStepResolved -= HandleStepResolved;
             battleManager.OnEnemyCounterAttack -= HandleEnemyCounterAttack;
             battleManager.OnVictory -= HandleVictory;
             battleManager.OnDefeat -= HandleDefeat;
+            battleManager.OnSpecialAbilityDamageDealt -= HandleSpecialAbilityDamage;
         }
 
         private void HandleBattleStarted()
@@ -71,6 +76,12 @@ namespace BlockeonsDratris.UI
                 energyBar.SetEnergy(current, max);
         }
 
+        private void HandleShieldChanged(int currentShield)
+        {
+            if (shieldBar != null)
+                shieldBar.SetShield(currentShield);
+        }
+
         private void HandleStepResolved(CombatResult result, int chainIndex)
         {
             if (chainIndicator != null)
@@ -95,6 +106,16 @@ namespace BlockeonsDratris.UI
         {
             if (resultPanel != null)
                 resultPanel.ShowDefeat();
+        }
+
+        private void HandleSpecialAbilityDamage(int damage)
+        {
+            if (chainIndicator != null)
+            {
+                // Reaproveita o mesmo indicador de feedback textual do chain,
+                // já que ele já tem lógica de fade in/out pronta.
+                chainIndicator.ShowSpecialAbilityResult(damage);
+            }
         }
     }
 }

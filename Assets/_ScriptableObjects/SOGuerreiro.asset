@@ -16,12 +16,14 @@ MonoBehaviour:
   classType: 0
   portrait: {fileID: 0}
   maxHP: 100
+  maxShield: 100
   baseDamage: 10
   strength: 0
   intelligence: 0
   dexterity: 0
-  maxEnergy: 100
-  specialAbilityCost: 100
+  maxEnergy: 50
+  specialAbilityCost: 50
+  specialAbilityDamage: 500
   strongBlock: 0
   neutralBlock: 1
   weakBlock: 2

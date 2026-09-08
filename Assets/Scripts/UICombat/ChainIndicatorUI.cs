@@ -55,7 +55,21 @@ namespace BlockeonsDratris.UI
             if (result.energyGained > 0)
                 parts.Add($"+{result.energyGained} Energia");
 
+            if (result.shieldGained > 0)
+                parts.Add($"+{result.shieldGained} Escudo");
+
             return parts.Count > 0 ? string.Join("  ", parts) : string.Empty;
+        }
+
+        public void ShowSpecialAbilityResult(int damage)
+        {
+            if (stepResultText != null)
+            {
+                stepResultText.text = $"-{damage} HP (Especial!)";
+
+                if (fadeRoutine != null) StopCoroutine(fadeRoutine);
+                fadeRoutine = StartCoroutine(FadeInOut());
+            }
         }
 
         private IEnumerator FadeInOut()
