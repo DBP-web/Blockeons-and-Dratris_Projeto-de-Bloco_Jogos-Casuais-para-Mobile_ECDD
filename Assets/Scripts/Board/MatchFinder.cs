@@ -62,7 +62,11 @@ namespace BlockeonsDratris.Board
             FloodFill(c, r - 1, key, visited, group);
         }
 
-        private string GetBlockKey(BlockBase block)
+        // Antes: private string GetBlockKey(BlockBase block)
+        // Agora: público e estático, para poder ser chamado de fora (BoardManager),
+        // isso foi necessario para resolver o problema dos blocos estarem sumindo
+        // com um inicio movimento no inicio do jogo.  
+        public static string GetBlockKey(BlockBase block)
         {
             switch (block)
             {
