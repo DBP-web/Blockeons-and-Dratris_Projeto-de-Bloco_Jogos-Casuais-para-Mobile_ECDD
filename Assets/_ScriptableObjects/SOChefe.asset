@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlockeonsDratris.Data.SOEnemyData
   enemyName: 
   portrait: {fileID: 0}
-  maxHP: 2000
+  maxHP: 500
   counterAttackDamage: 30
   movesPerCounterAttack: 3
