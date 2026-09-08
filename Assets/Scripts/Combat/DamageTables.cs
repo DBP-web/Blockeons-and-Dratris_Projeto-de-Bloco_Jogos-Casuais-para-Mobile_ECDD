@@ -11,6 +11,7 @@ namespace BlockeonsDratris.Combat
         public const float NeutralMultiplier = 1.0f;
         public const float WeakMultiplier = 0.5f;
         public const float FixedHealPerBlock = 8f;
+        public const float ShieldPerBlock = 1f;
 
         public static float GetAffinityMultiplier(OffensiveBlockType blockType, SOHeroData hero)
         {

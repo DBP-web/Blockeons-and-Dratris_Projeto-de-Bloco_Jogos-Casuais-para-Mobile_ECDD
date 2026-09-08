@@ -24,6 +24,7 @@ namespace BlockeonsDratris.Combat
         public int currentHeroHP;
         public int currentEnemyHP;
         public int currentEnergy;
+        public int currentShield = 0;
         public int movesSinceLastCounterAttack = 0;
         public int totalGoldGained = 0;
         public int totalCrystalsGained = 0;
@@ -44,6 +45,8 @@ namespace BlockeonsDratris.Combat
         public event System.Action<int, int> OnVictory; // (totalGold, totalCrystals)
         public event System.Action OnDefeat;
         public event System.Action OnSpecialAbilityUsed; // uso da habilidade especial
+        public event System.Action<int> OnSpecialAbilityDamageDealt; // uso da habilidade especial
+        public event System.Action<int> OnShieldChanged; // para o escudo
 
         void Awake()
         {
@@ -82,6 +85,7 @@ namespace BlockeonsDratris.Combat
             currentHeroHP = heroData.maxHP;
             currentEnemyHP = enemyData.maxHP;
             currentEnergy = 0;
+            currentShield = 0;
             movesSinceLastCounterAttack = 0;
             totalGoldGained = 0;
             totalCrystalsGained = 0;
@@ -93,6 +97,7 @@ namespace BlockeonsDratris.Combat
             OnHeroHPChanged?.Invoke(currentHeroHP, heroData.maxHP);
             OnEnemyHPChanged?.Invoke(currentEnemyHP, enemyData.maxHP);
             OnEnergyChanged?.Invoke(currentEnergy, heroData.maxEnergy);
+            OnShieldChanged?.Invoke(currentShield);
         }
 
         private void HandleChainStep(List<MatchGroup> matches, int chainIndex)
@@ -104,6 +109,7 @@ namespace BlockeonsDratris.Combat
             currentEnemyHP = Mathf.Max(0, currentEnemyHP - Mathf.RoundToInt(result.totalDamageToEnemy));
             currentHeroHP = Mathf.Min(heroData.maxHP, currentHeroHP + Mathf.RoundToInt(result.totalHealToHero));
             currentEnergy = Mathf.Min(heroData.maxEnergy, currentEnergy + result.energyGained);
+            currentShield = Mathf.Min(heroData.maxShield, currentShield + result.shieldGained);
 
             totalGoldGained += result.goldGained;
             totalCrystalsGained += result.crystalsGained;
@@ -112,6 +118,7 @@ namespace BlockeonsDratris.Combat
             OnEnemyHPChanged?.Invoke(currentEnemyHP, enemyData.maxHP);
             OnHeroHPChanged?.Invoke(currentHeroHP, heroData.maxHP);
             OnEnergyChanged?.Invoke(currentEnergy, heroData.maxEnergy);
+            OnShieldChanged?.Invoke(currentShield);
 
             CheckBattleEnd();
         }
@@ -133,8 +140,20 @@ namespace BlockeonsDratris.Combat
         {
             if (battleEnded) return;
 
-            currentHeroHP = Mathf.Max(0, currentHeroHP - enemyData.counterAttackDamage);
-            OnEnemyCounterAttack?.Invoke(enemyData.counterAttackDamage);
+            int incomingDamage = enemyData.counterAttackDamage;
+            int damageAfterShield = incomingDamage;
+
+            if (currentShield > 0)
+            {
+                int absorbed = Mathf.Min(currentShield, incomingDamage);
+                currentShield -= absorbed;
+                damageAfterShield -= absorbed;
+
+                OnShieldChanged?.Invoke(currentShield); // atualiza a UI do escudo imediatamente
+            }
+
+            currentHeroHP = Mathf.Max(0, currentHeroHP - damageAfterShield);
+            OnEnemyCounterAttack?.Invoke(incomingDamage); // mantém o valor cheio do golpe para feedback visual do ataque
             OnHeroHPChanged?.Invoke(currentHeroHP, heroData.maxHP);
 
             CheckBattleEnd();
@@ -149,9 +168,14 @@ namespace BlockeonsDratris.Combat
             OnEnergyChanged?.Invoke(currentEnergy, heroData.maxEnergy);
             OnSpecialAbilityUsed?.Invoke();
 
-            // Efeito da habilidade especial será resolvido em módulo futuro
-            // pois ainda nao sabemos se vamos colocar ataque especial ou nao. 
-            // (ex.: SpecialAbilityResolver), acionado a partir daqui.
+            // Aplica o dano da habilidade especial diretamente ao inimigo
+            int abilityDamage = heroData.specialAbilityDamage;
+            currentEnemyHP = Mathf.Max(0, currentEnemyHP - abilityDamage);
+
+            OnEnemyHPChanged?.Invoke(currentEnemyHP, enemyData.maxHP);
+            OnSpecialAbilityDamageDealt?.Invoke(abilityDamage); // NOVO: para popup/feedback visual do golpe especial
+
+            CheckBattleEnd();
 
             return true;
         }

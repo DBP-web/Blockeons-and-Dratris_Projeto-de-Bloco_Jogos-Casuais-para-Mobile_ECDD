@@ -13,6 +13,7 @@ namespace BlockeonsDratris.Combat
         public int goldGained;
         public int crystalsGained;
         public int energyGained;
+        public int shieldGained;
     }
 
     public class DamageCalculator : MonoBehaviour
@@ -93,7 +94,7 @@ namespace BlockeonsDratris.Combat
             switch (shield.shieldBlocktype)
             { 
                 case ShieldBlockType.Shield:
-                result.goldGained += Mathf.RoundToInt(groupSize * 10 * sizeMult);
+                result.shieldGained += Mathf.RoundToInt(groupSize * DamageTables.ShieldPerBlock * sizeMult * sizeMult);
                 break; 
             }
         }
