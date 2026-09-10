@@ -19,6 +19,7 @@ namespace BlockeonsDratris.Board
         [Header("Eventos")]
         public System.Action<List<MatchGroup>, int> OnChainStep; // matches, chainIndex (1-based)
         public System.Action OnBoardStable;
+        public System.Action OnInvalidMove;
 
         private BlockBase[,] grid;
         private MatchFinder matchFinder;
@@ -226,6 +227,8 @@ namespace BlockeonsDratris.Board
             if (matches.Count == 0)
             {
                 // Desfaz a jogada, pois não gerou nenhum match
+                OnInvalidMove?.Invoke();
+
                 SwapBlocksInGrid(a, b);
                 yield return AnimateSwap(a, b);
                 isProcessing = false;
