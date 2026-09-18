@@ -19,7 +19,7 @@ namespace BlockeonsDratris.Board
         [Header("Eventos")]
         public System.Action<List<MatchGroup>, int> OnChainStep; // matches, chainIndex (1-based)
         public System.Action OnBoardStable;
-        public System.Action OnInvalidMove;
+        public System.Action OnInvalidMove; // evento para a parte de som
 
         private BlockBase[,] grid;
         private MatchFinder matchFinder;
@@ -207,11 +207,17 @@ namespace BlockeonsDratris.Board
             int targetC = selectedBlock.column + dx;
             int targetR = selectedBlock.row + dy;
 
-            if (targetC < 0 || targetC >= columns || targetR < 0 || targetR >= rows) return;
-
+            if (targetC < 0 || targetC >= columns || targetR < 0 || targetR >= rows)
+            {
+                OnInvalidMove?.Invoke(); // efeito sonoro
+                return;
+            }
             BlockBase targetBlock = grid[targetC, targetR];
-            if (targetBlock == null) return;
-
+            if (targetBlock == null)
+            {
+                OnInvalidMove?.Invoke(); // efeito sonoro
+                return;
+            }
             StartCoroutine(SwapAndResolve(selectedBlock, targetBlock));
         }
 
@@ -227,11 +233,10 @@ namespace BlockeonsDratris.Board
             if (matches.Count == 0)
             {
                 // Desfaz a jogada, pois não gerou nenhum match
-                OnInvalidMove?.Invoke();
-
                 SwapBlocksInGrid(a, b);
                 yield return AnimateSwap(a, b);
                 isProcessing = false;
+                OnInvalidMove?.Invoke(); // efeito sonoro
                 yield break;
             }
 

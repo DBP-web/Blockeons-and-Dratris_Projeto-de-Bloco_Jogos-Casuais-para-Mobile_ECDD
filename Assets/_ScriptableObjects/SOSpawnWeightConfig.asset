@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e1dfd79c0b2647419568bb5ad917c79, type: 3}
+  m_Name: SOSpawnWeightConfig
+  m_EditorClassIdentifier: Assembly-CSharp::BlockeonsDratris.Data.SOSpawnWeightConfig
+  rareChance: 15
+  healChance: 50
+  goldChance: 33
+  crystalChance: 17
+  offensiveChance: 75
+  shieldChance: 25
+  gameModes:
+  - {fileID: 11400000, guid: 2c59ce9a1dd7d7b4f9dbc53dd4d5968d, type: 2}
+  offensiveVisuals:
+  - type: 0
+    sprite: {fileID: 7106006373071044053, guid: a9dfe2ac478ce6e4d913b9d63cb420ca, type: 3}
+  - type: 1
+    sprite: {fileID: 6117166128104174013, guid: 2cd042a9bdfa035429f46d2bbf3948c2, type: 3}
+  - type: 2
+    sprite: {fileID: 4165744578364248480, guid: 7c890a866c7415745bf31339640949c3, type: 3}
+  supportVisuals:
+  - type: 0
+    sprite: {fileID: 7672227664291781185, guid: 1dd7e465f1b64bb44a5284476ffabafa, type: 3}
+  - type: 1
+    sprite: {fileID: 7657526778106704023, guid: 9b28e3ac07871c94dbed2851bfdff20c, type: 3}
+  - type: 2
+    sprite: {fileID: -4285669902912782617, guid: 6e08e3902daec4a4faea4f87681508d9, type: 3}
+  shieldSprite: {fileID: 2692730841015466522, guid: 5037616ae6c650f4aa855ae2c0436cdc, type: 3}
