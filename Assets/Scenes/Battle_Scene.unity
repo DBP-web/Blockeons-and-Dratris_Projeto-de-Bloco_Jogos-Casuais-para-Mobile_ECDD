@@ -3426,12 +3426,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 978740336}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1824417289}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &979684290
 GameObject:
@@ -4236,6 +4236,69 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1322079441}
   m_CullTransparentMesh: 1
+--- !u!1 &1385877033
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1385877035}
+  - component: {fileID: 1385877034}
+  m_Layer: 0
+  m_Name: Battle_VFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1385877034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385877033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a03fcdeb3a99f5e468ed98b99a1c802c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlockeonsDratris.Board.BlockVFXController
+  selectPulseScale: 1.15
+  selectPulseDuration: 0.35
+  swapDuration: 0.2
+  swapEase: 6
+  fallDuration: 0.28
+  fallEase: 30
+  fallSquashAmount: 0.85
+  fallSquashDuration: 0.08
+  matchGrowScale: 1.25
+  matchGrowDuration: 0.12
+  matchShakeStrength: 0.08
+  matchShakeDuration: 0.15
+  matchShakeVibrato: 12
+  matchShrinkDuration: 0.15
+  flashDuration: 0.12
+  offensiveFlashColor: {r: 0.41821158, g: 1, b: 0, a: 0.5686275}
+  supportFlashColor: {r: 1, g: 0, b: 0.55868816, a: 0.5686275}
+  shieldFlashColor: {r: 0, g: 1, b: 1, a: 0.5764706}
+  explosionParticlePrefab: {fileID: 8681565936411569817, guid: 1f989a4a48439e84fabe2c08b3d781a7, type: 3}
+--- !u!4 &1385877035
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385877033}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2116129844}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1489139812
 GameObject:
   m_ObjectHideFlags: 0
@@ -4653,7 +4716,7 @@ Transform:
   m_GameObject: {fileID: 1579665648}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -1.86, y: 2.85, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5004,6 +5067,7 @@ MonoBehaviour:
   cellSize: 0.5
   boardOrigin: {x: -1.5, y: -4}
   spawner: {fileID: 2116129843}
+  vfxController: {fileID: 1385877034}
 --- !u!4 &1824417289
 Transform:
   m_ObjectHideFlags: 0
@@ -5017,6 +5081,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 978740339}
   - {fileID: 2116129844}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5786,7 +5851,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1385877035}
   m_Father: {fileID: 1824417289}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!210 &2116129845
@@ -5814,4 +5880,3 @@ SceneRoots:
   - {fileID: 1307168870}
   - {fileID: 793834342}
   - {fileID: 1546901927}
-  - {fileID: 978740339}
