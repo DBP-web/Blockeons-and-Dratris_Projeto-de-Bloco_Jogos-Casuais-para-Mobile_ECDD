@@ -8,18 +8,21 @@ namespace BlockeonsDratris.Board
     public class BoardManager : MonoBehaviour
     {
         [Header("Configuração do Grid")]
-        public int columns = 9;
-        public int rows = 9;
+        public int columns = 7;
+        public int rows = 8;
         public float cellSize = 0.5f;
         public Vector2 boardOrigin = Vector2.zero;
 
         [Header("Referências")]
         public BlockSpawner spawner;
+        public BlockVFXController vfxController; // Controlador centralizado de VFX (DOTween)
 
         [Header("Eventos")]
         public System.Action<List<MatchGroup>, int> OnChainStep; // matches, chainIndex (1-based)
         public System.Action OnBoardStable;
         public System.Action OnInvalidMove; // evento para a parte de som
+        public System.Action OnFallAnimationComplete;   // para BattleAudioController
+        public System.Action OnMatchAnimationComplete;  // para BattleAudioController
 
         private BlockBase[,] grid;
         private MatchFinder matchFinder;
@@ -43,9 +46,10 @@ namespace BlockeonsDratris.Board
             {
                 for (int r = 0; r < rows; r++)
                 {
-                    SpawnBlockAt(c, r);
+                    SpawnBlockAt(c, r, spawnAboveBoard: true); // nasce acima do tabuleiro para cair animado
                 }
             }
+            StartCoroutine(AnimateFallToGridPositions()); // queda inicial animada
         }
 
         public void ClearBoard()
@@ -86,9 +90,8 @@ namespace BlockeonsDratris.Board
         // logo após o primeiro swipe do jogo. Isso elimina as "ilhas gigantes" que formavam um bloco compacto,
         // porque a única forma de ter uma ilha conectada em formato irregular (tipo L ou T)
         // sem ser detectada por essa checagem seria via diagonais.
-        private void SpawnBlockAt(int c, int r)
+        private void SpawnBlockAt(int c, int r, bool spawnAboveBoard = false)
         {
-
             GameObject obj = null;
             BlockBase block = null;
             int attempts = 0;
@@ -110,9 +113,19 @@ namespace BlockeonsDratris.Board
             }
             while (attempts < MaxSpawnAttempts && CreatesPrematureMatch(c, r));
 
-            block.Setup(c, r);
-            block.SetWorldPosition(GridToWorld(c, r));
-            grid[c, r] = block; // confirma a posição final
+            // Se for spawn inicial ou refill pós-match, nasce acima do tabuleiro
+            Vector3 finalPos = GridToWorld(c, r);
+            if (spawnAboveBoard)
+            {
+                Vector3 spawnPos = finalPos + Vector3.up * (rows * cellSize);
+                block.SetWorldPosition(spawnPos);
+            }
+            else
+            {
+                block.SetWorldPosition(finalPos);
+            }
+
+            grid[c, r] = block;
         }
 
         // Usa o MatchFinder real (mesma lógica de flood fill do jogo) para checar
@@ -156,6 +169,7 @@ namespace BlockeonsDratris.Board
                 {
                     touchStartPos = touch.position;
                     selectedBlock = GetBlockUnderScreenPoint(touch.position);
+                    if (selectedBlock != null) vfxController.StartSelectPulse(selectedBlock.transform);
                 }
                 else if (touch.phase == TouchPhase.Ended && selectedBlock != null)
                 {
@@ -168,6 +182,7 @@ namespace BlockeonsDratris.Board
             {
                 touchStartPos = Input.mousePosition;
                 selectedBlock = GetBlockUnderScreenPoint(Input.mousePosition);
+                if(selectedBlock != null) vfxController.StartSelectPulse(selectedBlock.transform); // FIX: faltava no fluxo de mouse
             }
             else if (Input.GetMouseButtonUp(0) && selectedBlock != null)
             {
@@ -263,25 +278,13 @@ namespace BlockeonsDratris.Board
             Vector3 posA = GridToWorld(a.column, a.row);
             Vector3 posB = GridToWorld(b.column, b.row);
 
-            float duration = 0.15f;
-            float elapsed = 0f;
+            bool doneA = false, doneB = false;
 
-            Vector3 startA = a.transform.position;
-            Vector3 startB = b.transform.position;
+            vfxController.AnimateSwap(a.transform, posA, () => doneA = true);
+            vfxController.AnimateSwap(b.transform, posB, () => doneB = true);
 
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                float t = elapsed / duration;
-                a.transform.position = Vector3.Lerp(startA, posA, t);
-                b.transform.position = Vector3.Lerp(startB, posB, t);
-                yield return null;
-            }
-
-            a.transform.position = posA;
-            b.transform.position = posB;
+            yield return new WaitUntil(() => doneA && doneB);
         }
-
         private IEnumerator ResolveChainLoop(List<MatchGroup> firstMatches)
         {
             var currentMatches = firstMatches;
@@ -301,16 +304,37 @@ namespace BlockeonsDratris.Board
 
         private IEnumerator RemoveMatchedBlocks(List<MatchGroup> matches)
         {
+            bool matchDone = false;
+
+            // Junta todos os blocos de todos os grupos numa única lista
+            var blocksToRemove = new List<BlockBase>();
             foreach (var group in matches)
             {
                 foreach (var block in group.blocks)
+                {
+                    if (block != null) blocksToRemove.Add(block);
+                }
+            }
+
+            if (blocksToRemove.Count == 0)
+            {
+                OnMatchAnimationComplete?.Invoke();
+                yield break;
+            }
+
+            vfxController.PlayMatchSequence(blocksToRemove, () =>
+            {
+                foreach (var block in blocksToRemove)
                 {
                     if (block == null) continue;
                     grid[block.column, block.row] = null;
                     Destroy(block.gameObject);
                 }
-            }
-            yield return null;
+                matchDone = true;
+            });
+
+            yield return new WaitUntil(() => matchDone);
+            OnMatchAnimationComplete?.Invoke(); // callback para áudio
         }
 
         private IEnumerator ApplyGravityAndRefill()
@@ -336,7 +360,7 @@ namespace BlockeonsDratris.Board
 
                 for (int r = writeRow; r < rows; r++)
                 {
-                    SpawnBlockAt(c, r);
+                    SpawnBlockAt(c, r, spawnAboveBoard: true);
                 }
             }
 
@@ -345,11 +369,7 @@ namespace BlockeonsDratris.Board
 
         private IEnumerator AnimateFallToGridPositions()
         {
-            float duration = 0.2f;
-            float elapsed = 0f;
-
-            var startPositions = new Dictionary<BlockBase, Vector3>();
-            var targetPositions = new Dictionary<BlockBase, Vector3>();
+            var targets = new List<(BlockBase block, Vector3 target)>();
 
             for (int c = 0; c < columns; c++)
             {
@@ -360,35 +380,25 @@ namespace BlockeonsDratris.Board
 
                     Vector3 target = GridToWorld(c, r);
                     if (block.transform.position != target)
-                    {
-                        startPositions[block] = block.transform.position;
-                        targetPositions[block] = target;
-                    }
+                        targets.Add((block, target));
                 }
             }
 
-            while (elapsed < duration)
+            if (targets.Count == 0) yield break;
+
+            bool fallDone = false;
+
+            // Converte para o formato que o VFXController espera (Transform, Vector3)
+            var fallData = new List<(Transform block, Vector3 targetPos)>();
+            foreach (var (block, target) in targets)
             {
-                elapsed += Time.deltaTime;
-                float t = elapsed / duration;
-
-                foreach (var kvp in targetPositions)
-                {
-                    BlockBase block = kvp.Key;
-                    if (block == null) continue;
-                    block.transform.position = Vector3.Lerp(startPositions[block], kvp.Value, t);
-                }
-
-                yield return null;
+                fallData.Add((block.transform, target));
             }
 
-            foreach (var kvp in targetPositions)
-            {
-                if (kvp.Key != null)
-                {
-                    kvp.Key.transform.position = kvp.Value;
-                }
-            }
+            vfxController.AnimateFall(fallData, () => fallDone = true);
+
+            yield return new WaitUntil(() => fallDone);
+            OnFallAnimationComplete?.Invoke(); // callback para áudio
         }
     }
 }
