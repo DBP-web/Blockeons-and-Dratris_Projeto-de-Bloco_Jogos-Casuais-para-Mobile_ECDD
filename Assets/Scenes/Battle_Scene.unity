@@ -4591,9 +4591,9 @@ MonoBehaviour:
   matchShakeVibrato: 12
   matchShrinkDuration: 0.15
   flashDuration: 0.12
-  offensiveFlashColor: {r: 0.41821158, g: 1, b: 0, a: 0.5686275}
-  supportFlashColor: {r: 1, g: 0, b: 0.55868816, a: 0.5686275}
-  shieldFlashColor: {r: 0, g: 1, b: 1, a: 0.5764706}
+  offensiveFlashColor: {r: 0, g: 0.94470406, b: 1, a: 0.78431374}
+  supportFlashColor: {r: 0.9468937, g: 1, b: 0, a: 0.78431374}
+  shieldFlashColor: {r: 1, g: 0.7783019, b: 0.97269356, a: 0.78431374}
   explosionParticlePrefab: {fileID: 8681565936411569817, guid: 1f989a4a48439e84fabe2c08b3d781a7, type: 3}
 --- !u!4 &1385877035
 Transform:
@@ -5854,7 +5854,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -57.241028, y: -104.32007}
+  m_AnchoredPosition: {x: -57.240967, y: -104.32031}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &2059942819
