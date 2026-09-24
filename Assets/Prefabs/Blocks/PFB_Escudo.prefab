@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85efa07261a757940b061f197cab0ef2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockeonsDratris.Blocks.ShieldBlock
-  category: 0
+  category: 2
   spriteRenderer: {fileID: 968211476746272846}
   column: 0
   row: 0

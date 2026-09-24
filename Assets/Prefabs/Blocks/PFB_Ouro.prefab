@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b909b0836089b44c8d1792985abce98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockeonsDratris.Blocks.SupportBlock
-  category: 0
+  category: 1
   spriteRenderer: {fileID: 6730285310182023010}
   column: 0
   row: 0
